@@ -1,0 +1,3 @@
+[codespell]
+skip = **/package-lock.json,**/*.js
+ignore-words-list = doubleclick
