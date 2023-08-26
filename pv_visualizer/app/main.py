@@ -28,8 +28,8 @@ def main(server=None, data=None, plugins=None, **kwargs):
     server.client_type = "vue2"
     SERVER = server
 
-    engine.initialize(server, plugins)
-    ui.initialize(server)
+    engine.initialize(server, plugins)# ./engine/__init__.py
+    ui.initialize(server) # ./ui/__init__.py
 
     # Start server
     return server.start(**kwargs)

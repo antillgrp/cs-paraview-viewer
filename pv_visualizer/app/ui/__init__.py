@@ -1,4 +1,4 @@
-from .main import initialize
+from .main1 import initialize
 
 __all__ = [
     "initialize",

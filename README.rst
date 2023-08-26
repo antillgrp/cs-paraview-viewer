@@ -46,9 +46,10 @@ Create a virtual environment to use with your `ParaView 5.10+ <https://www.parav
 ::
 
     python -m venv .venv
-    source .venv/Scripts/activate
+    .venv/Scripts/activate
     python -m pip install -U pip
     pip install -e .
+    deactivate
 
 Download ParaView Server (Only if not downloaded already) 
 
