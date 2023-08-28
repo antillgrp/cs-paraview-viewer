@@ -58,6 +58,8 @@ LIFE_CYCLES = [
 # Layout
 # -----------------------------------------------------------------------------
 
+def decrement():
+    state.my_number -= 1
 
 def initialize(server):
     state, ctrl = server.state, server.controller
