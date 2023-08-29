@@ -29,7 +29,6 @@ def _reload():
         state_change,
     )
 
-
 # -----------------------------------------------------------------------------
 # Common style properties
 # -----------------------------------------------------------------------------
@@ -118,6 +117,8 @@ def initialize(server):
     """
     """
     ICONS: https://icon-sets.iconify.design/mdi/account-card-outline/
+
+    https://icon-sets.iconify.design/mdi/
     
     """
     
@@ -132,41 +133,93 @@ def initialize(server):
         # Fav
         # -----------------------------------------------------------------------------
         
-        with vuetify.VCard(
-            elevation=3,
-            color="transparent",
-            classes="d-flex flex-row rounded-lg pa-1",
-            style="position: absolute; left: 20px; top: 20px; z-index: 1;",
-        ):
+        # with vuetify.VCard(
+        #     #elevation=3,
+        #     color="transparent",
+        #     classes="d-flex flex-row rounded-lg pa-0",
+        #     style="position: absolute; left: 15px; top: 15px; z-index: 1;",
+
+        # ):
+        with html.Div(
+                color="transparent",
+                classes="d-flex justify-center",
+                style="position: absolute; left: 15px; top: 15px; z-index: 1;"
+            ):
             with vuetify.VTooltip(bottom=True):
                 with vuetify.Template(v_slot_activator="{ on, attrs }"):
                     with vuetify.VBtn(
                         fab=True,
+                        elevation=3,
                         #absolute=True,
                         # right=True,
                         # top=True,
+                        #outlined=True,
+                        rounded=True,
+                        small=True,
                         v_bind="attrs",
                         v_on="on",
                         icon=True,
                         click=f"{drawer_name} = !{drawer_name}",
                     ):
-                        vuetify.VIcon("mdi-vuetify")
-                html.Span("ToolBox")    
+                        vuetify.VIcon("mdi-menu")
+                html.Span("ToolBox") 
+            vuetify.VSpacer(classes="pa-1")   
             with vuetify.VTooltip(bottom=True):
                 with vuetify.Template(v_slot_activator="{ on, attrs }"):
                     with vuetify.VBtn(
                         fab=True,
+                        elevation=3,
                         #absolute=True,
                         # right=True,
                         # top=True,
+                        #outlined=True,
+                        rounded=True,
+                        small=True,
                         v_bind="attrs",
                         v_on="on",
                         icon=True,
                         click=f"{drawer_name} = !{drawer_name}",
                     ):
-                        vuetify.VIcon("mdi-wall-sconce")
-                html.Span("ToolBox")        
-                
+                        vuetify.VIcon("mdi-arrow-collapse-all")
+                html.Span("ToolBox") 
+            vuetify.VSpacer(classes="pa-1")   
+            with vuetify.VTooltip(bottom=True):
+                with vuetify.Template(v_slot_activator="{ on, attrs }"):
+                    with vuetify.VBtn(
+                        fab=True,
+                        elevation=3,
+                        #absolute=True,
+                        # right=True,
+                        # top=True,
+                        #outlined=True,
+                        rounded=True,
+                        small=True,
+                        v_bind="attrs",
+                        v_on="on",
+                        icon=True,
+                        click=f"{drawer_name} = !{drawer_name}",
+                    ):
+                        vuetify.VIcon("mdi-arrow-expand-all")
+                html.Span("ToolBox")
+            vuetify.VSpacer(classes="pa-1")        
+            with vuetify.VTooltip(bottom=True):
+                with vuetify.Template(v_slot_activator="{ on, attrs }"):
+                    with vuetify.VBtn(
+                        fab=True,
+                        elevation=3,
+                        #absolute=True,
+                        # right=True,
+                        # top=True,
+                        #outlined=True,
+                        rounded=True,
+                        small=True,
+                        v_bind="attrs",
+                        v_on="on",
+                        icon=True,
+                        click=f"{drawer_name} = !{drawer_name}",
+                    ):
+                        vuetify.VIcon("mdi-camera-plus")
+                html.Span("ToolBox")  
         
         # -----------------------------------------------------------------------------=
         # Drawer
@@ -200,7 +253,7 @@ def initialize(server):
         # Main content
         # -----------------------------------------------------------------------------
         
-        layout.content = vuetify.VMain()
+        # layout.content = vuetify.VMain()
         layout.content = html.Div(classes="fill-height pa-0 ma-0", style="border-color: blue;border-style: solid; border-width: thin;")
         #with html.Div(style="border-color: blue;border-style: solid; border-width: thin;"):
         with layout.content:
