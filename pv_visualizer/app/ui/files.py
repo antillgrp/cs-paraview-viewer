@@ -24,7 +24,10 @@ def initialize(server):
     args, _ = server.cli.parse_known_args()
 
     def add_prefix(file_path):
-        return str(Path(os.path.join(args.data, file_path)).absolute())
+        print("file_path:", file_path)
+        path_prefix = str(Path(os.path.join(args.data, file_path)).absolute())
+        print("path_prefix:", path_prefix)
+        return path_prefix
 
     def load_file(files):
         active_change = False
