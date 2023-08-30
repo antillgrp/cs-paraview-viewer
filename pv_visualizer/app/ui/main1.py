@@ -75,16 +75,16 @@ def initialize(server):
         settings,
     ]
 
-    state, ctrl = server.state, server.controller
+    #state, ctrl = server.state, server.controller
 
     # state
-    state.trame__title = "Visualizer"
-    state.trame__favicon = asset_manager.icon
+    server.state.trame__title = "Visualizer"
+    #state.trame__favicon = asset_manager.icon
 
     # controller
-    ctrl.on_server_reload.add(_reload)
-    ctrl.on_data_change.add(ctrl.view_update)
-    ctrl.on_data_change.add(ctrl.pipeline_update)
+    server.controller.on_server_reload.add(_reload)
+    server.controller.on_data_change.add(ctrl.view_update)
+    server.controller.on_data_change.add(ctrl.pipeline_update)
 
     # Init other components
     state_change.initialize(server)
