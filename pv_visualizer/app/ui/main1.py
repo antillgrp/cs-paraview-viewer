@@ -6,6 +6,15 @@ from trame_simput import get_simput_manager
 
 from paraview import simple
 
+class Counter():
+    def __init__(self):
+        self.theCount = -1 
+    def __call__(self):
+        self.theCount += 1
+        return self.theCount
+    
+myCount = Counter() 
+
 # from pv_visualizer import html as my_widgets
 from pv_visualizer.app.assets import asset_manager
 from pv_visualizer.app.ui import (
@@ -13,7 +22,7 @@ from pv_visualizer.app.ui import (
     files,
     algorithms,
     settings,
-    view_toolbox,
+    #view_toolbox,
     state_change,
 )
 #from pip._vendor.rich import print
@@ -25,7 +34,7 @@ def _reload():
         files,
         algorithms,
         settings,
-        view_toolbox,
+        #view_toolbox,
         state_change,
     )
 
@@ -65,16 +74,23 @@ def create_main_toolbox(TOOLS):
                         vuetify.VIcon(toolDict["iconName"])
                 html.Span(toolDict["tooltipTxt"]) 
             vuetify.VSpacer(classes="pa-1")
+        vuetify.VSpacer(classes="pa-1")
+        vuetify.VTextField(
+                v_show=("!!active_controls",),
+                v_model=("search", ""),
+                clearable=True,
+                outlined=True,
+                filled=True,
+                rounded=True,
+                prepend_inner_icon="mdi-magnify",
+                dense= True,
+                hide_details= True,
+            )
                     
 def initialize(server):
     
-    CONTROLS = [ 
-        pipeline,
-        files,
-        algorithms,
-        settings,
-    ]
-
+    print ("\n!!!MAIN initialize COUNTER!!!:", myCount(),"\n") #debug
+    
     #state, ctrl = server.state, server.controller
 
     # state
@@ -83,13 +99,12 @@ def initialize(server):
 
     # controller
     server.controller.on_server_reload.add(_reload)
-    server.controller.on_data_change.add(ctrl.view_update)
-    server.controller.on_data_change.add(ctrl.pipeline_update)
-
-    # Init other components
-    state_change.initialize(server)
-    for m in CONTROLS:
-        m.initialize(server)
+    server.controller.on_data_change.add(
+        server.controller.view_update
+    )
+    server.controller.on_data_change.add(
+        server.controller.pipeline_update
+    )
 
     # simput
     simput_manager = get_simput_manager("pxm")
@@ -100,97 +115,115 @@ def initialize(server):
         ref="simput",
         query=("search", ""),
     )
-    ctrl.pxm_apply = simput_widget.apply
-    ctrl.pxm_reset = simput_widget.reset
+    server.controller.pxm_apply = simput_widget.apply
+    server.controller.pxm_reset = simput_widget.reset
+    
+    # Init other components
+    state_change.initialize(server)
     
     with VAppLayout(server) as layout:
         
+        layout.root = simput_widget
+       
         layout.on_server_reload = lambda self: self.server.controller.on_server_reload(self.server)
         
         layout.template_name="main"
         drawer_name = f"{layout.template_name}_drawer"
         
         # -----------------------------------------------------------------------------
-        # Main ToolBox
+        # Main ToolBox (replacing ToolBar)
         # -----------------------------------------------------------------------------
-        
+                
         """
             {"clickFn": ...,"iconName": ..., "tooltipTxt": ...}
         """
         create_main_toolbox([               
-            { 
-                "clickFn": f"{drawer_name} = !{drawer_name}", 
-                "iconName": "mdi-menu", 
-                "tooltipTxt": "ToolBox"
-            },
-            { 
-                "clickFn": "alert(\'Reload\')", 
-                "iconName": "mdi-reload", 
-                "tooltipTxt": "Reload"
-            },
-            { 
-                "clickFn": "alert(\'Center to the screen\')", 
-                "iconName": "mdi-arrow-collapse-all", 
-                "tooltipTxt": "Center to the screen"
-            },
-            { 
-                "clickFn": "alert(\'Expand to the screen\')", 
-                "iconName": "mdi-arrow-expand-all", 
-                "tooltipTxt": "Expand to the screen"
-            },
-            { 
-                "clickFn": "alert(\'Take screen shot\')", 
-                "iconName": "mdi-camera-plus", 
-                "tooltipTxt": "Take screen shot"
-            },
-        ])
+                { 
+                    "clickFn": f"{drawer_name} = !{drawer_name}", 
+                    "iconName": "mdi-menu", 
+                    "tooltipTxt": "ToolBox"
+                },
+                { 
+                    "clickFn": "alert(\'Reload\')", 
+                    "iconName": "mdi-reload", 
+                    "tooltipTxt": "Reload"
+                },
+                { 
+                    "clickFn": "alert(\'Center to the screen\')", 
+                    "iconName": "mdi-arrow-collapse-all", 
+                    "tooltipTxt": "Center to the screen"
+                },
+                { 
+                    "clickFn": "alert(\'Expand to the screen\')", 
+                    "iconName": "mdi-arrow-expand-all", 
+                    "tooltipTxt": "Expand to the screen"
+                },
+                { 
+                    "clickFn": "alert(\'Take screen shot\')", 
+                    "iconName": "mdi-camera-plus", 
+                    "tooltipTxt": "Take screen shot"
+                },
+            ])
         
-        print(layout)
-        
-        # -----------------------------------------------------------------------------
-        # Drawer
-        # -----------------------------------------------------------------------------
+        #print(layout) #debug
         
         # -----------------------------------------------------------------------------
-        # Common style properties
+        # Main Drawer
         # -----------------------------------------------------------------------------
-
-        common_attrs = {
-            "dense": True,
-            "hide_details": True,
-        }
-       
+        
         with vuetify.VNavigationDrawer(
-            app=True,
-            right=True,
-            clipped=True,
-            stateless=True,
-            v_model=(drawer_name, True),
-            width=300,
-            #color="transparent",
-        ):  # as drawer:
-            with html.Div(classes="d-flex justify-center"):
-                with vuetify.VBtnToggle(
-                    v_model=("active_controls", "files"),
-                    **common_attrs,
-                    outlined=True,
-                    rounded=True,
-                    classes="pt-4 pb-4",
-                ):
-                        #with html.Div(classes="d-flex ma-4 align-center justify-space-around"):
-                        for item in CONTROLS:
-                            with vuetify.VBtn(value=item.NAME, **common_attrs):
-                                vuetify.VIcon(item.ICON, **item.ICON_STYLE)
-            
-            with html.Div(classes="d-flex justify-center"):
-                for item in CONTROLS:
-                    item.create_panel(server)
-                    
+                app=True,
+                right=True,
+                clipped=True,
+                stateless=True,
+                v_model=(drawer_name, True),
+                width=350,
+                #color="transparent",
+            ):  # as drawer:
+                
+                common_attrs = {
+                    "dense": True,
+                    "hide_details": True,
+                }
+                
+                CONTROLS = [ 
+                    files,
+                    pipeline,
+                    algorithms,
+                    settings,
+                ]
+                
+                files.VISIBLE = False
+                               
+                for control in CONTROLS: control.initialize(server)
+                
+                with html.Div(classes="d-flex justify-center"):
+                    with vuetify.VBtnToggle(
+                        v_model=(
+                            "active_controls", 
+                            #The first visible
+                            next(filter(lambda c: c.VISIBLE, CONTROLS)).NAME
+                        ),
+                        **common_attrs,
+                        outlined=True,
+                        rounded=True,
+                        classes="pt-4 pb-4",
+                    ):
+                        for control in CONTROLS:
+                            if(control.VISIBLE): 
+                                with vuetify.VBtn(value=control.NAME, **common_attrs):
+                                    vuetify.VIcon(control.ICON, **control.ICON_STYLE)
+                
+                with html.Div(classes="d-flex justify-center"):
+                    for control in CONTROLS:
+                        if(control.VISIBLE): control.create_panel(server)
+        
         # -----------------------------------------------------------------------------
-        # Main content
+        # Main Content
         # -----------------------------------------------------------------------------
         
         # layout.content = vuetify.VMain()
+        # debug
         layout.content = html.Div(classes="fill-height pa-0 ma-0", style="border-color: blue;border-style: solid; border-width: thin;")
         
         with layout.content:
@@ -204,12 +237,12 @@ def initialize(server):
                     namespace="view",
                     style="width: 100%; height: 100%;",
                 )
-                ctrl.view_replace = html_view.replace_view
-                ctrl.view_update = html_view.update
-                ctrl.view_reset_camera = html_view.reset_camera
-                ctrl.on_server_ready.add(ctrl.view_update)
-        
-        # print(layout)
+                server.controller.view_replace = html_view.replace_view
+                server.controller.view_update = html_view.update
+                server.controller.view_reset_camera = html_view.reset_camera
+                server.controller.on_server_ready.add(
+                    server.controller.view_update
+                )
         
     """
     https://github.com/vuetifyjs/vuetify/issues/11378

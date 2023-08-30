@@ -3,6 +3,8 @@ from .pipeline import NAME as pipeline_name
 
 from paraview import simple
 
+VISIBLE = True
+
 # -----------------------------------------------------------------------------
 # UI module
 # -----------------------------------------------------------------------------
@@ -12,7 +14,9 @@ ICON = "mdi-database-edit-outline"
 ICON_STYLE = {}
 
 
-def initialize(server):
+def initialize(server, visible=True):
+    VISIBLE=visible
+    
     state, ctrl = server.state, server.controller
 
     def create_filter(name):

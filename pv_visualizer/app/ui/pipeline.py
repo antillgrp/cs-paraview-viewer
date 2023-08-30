@@ -2,6 +2,7 @@ from trame.app import dev
 from trame.widgets import html, vuetify
 from pv_visualizer.html import pipeline, proxy_editor, data_information
 
+VISIBLE = True
 
 def _reload():
     dev.reload(
@@ -11,7 +12,9 @@ def _reload():
     )
 
 
-def initialize(server):
+def initialize(server, visible=True):
+    VISIBLE=visible
+    
     server.controller.on_server_reload.add(_reload)
 
 

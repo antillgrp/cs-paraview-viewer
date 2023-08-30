@@ -1,5 +1,6 @@
 from trame.widgets import html, vuetify, simput
 
+VISIBLE = True
 
 NAME = "settings"
 ICON = "mdi-cog"
@@ -10,8 +11,9 @@ COMPACT = {
     "hide_details": True,
 }
 
-
-def initialize(server):
+def initialize(server, visible=True):
+    VISIBLE=visible
+    
     state, ctrl = server.state, server.controller
 
     def reset_remote_rendering():

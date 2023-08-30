@@ -10,6 +10,7 @@ from paraview import simple
 # UI module
 # -----------------------------------------------------------------------------
 
+VISIBLE = True
 NAME = "files"
 ICON = "mdi-file-document-outline"
 ICON_STYLE = {}
@@ -19,7 +20,11 @@ ICON_STYLE = {}
 # -----------------------------------------------------------------------------
 
 
-def initialize(server):
+def initialize(server, visible=True):
+    VISIBLE=visible
+    
+    print("FILES: ","initializing...")
+    
     state, ctrl = server.state, server.controller
     args, _ = server.cli.parse_known_args()
 
@@ -30,6 +35,9 @@ def initialize(server):
         return path_prefix
 
     def load_file(files):
+        
+        print("FILES: ",str(files))
+        
         active_change = False
         if isinstance(files, list):
             # time series
@@ -72,6 +80,8 @@ def initialize(server):
     # -----------------------------------------------------------------------------
 
     ctrl.files_load_file = load_file
+
+
 
 
 # -----------------------------------------------------------------------------
