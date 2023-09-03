@@ -6,15 +6,6 @@ from trame_simput import get_simput_manager
 
 from paraview import simple
 
-class Counter():
-    def __init__(self):
-        self.theCount = -1 
-    def __call__(self):
-        self.theCount += 1
-        return self.theCount
-    
-myCount = Counter() 
-
 # from pv_visualizer import html as my_widgets
 from pv_visualizer.app.assets import asset_manager
 from pv_visualizer.app.ui import (
@@ -76,7 +67,9 @@ def create_main_toolbox(TOOLS):
             vuetify.VSpacer(classes="pa-1")
         vuetify.VSpacer(classes="pa-1")
         vuetify.VTextField(
-                v_show=("!!active_controls",),
+                v_show=("!!active_controls",), # https://bit.ly/3r1lmn5
+                # in JS a double exclamation mark (!!) it’s short way to 
+                # cast a variable to be a Boolean (true or false) value. 
                 v_model=("search", ""),
                 clearable=True,
                 outlined=True,
@@ -89,8 +82,6 @@ def create_main_toolbox(TOOLS):
                     
 def initialize(server):
     
-    print ("\n!!!MAIN initialize COUNTER!!!:", myCount(),"\n") #debug
-    
     #state, ctrl = server.state, server.controller
 
     # state
@@ -100,26 +91,36 @@ def initialize(server):
     # controller
     server.controller.on_server_reload.add(_reload)
     server.controller.on_data_change.add(
-        server.controller.view_update
-    )
+            server.controller.view_update
+        )
     server.controller.on_data_change.add(
-        server.controller.pipeline_update
-    )
+            server.controller.pipeline_update
+        )
 
     # simput
     simput_manager = get_simput_manager("pxm")
     simput_widget = simput.Simput(
-        simput_manager,
-        prefix="pxm",
-        trame_server=server,
-        ref="simput",
-        query=("search", ""),
-    )
+            simput_manager,
+            prefix="pxm",
+            trame_server=server,
+            ref="simput",
+            query=("search", ""),
+        )
     server.controller.pxm_apply = simput_widget.apply
     server.controller.pxm_reset = simput_widget.reset
     
+    # from pprint import pprint
+    # import inspect
+    # print("server.state:")
+    # pprint(inspect.getmembers(server.state))
+    
     # Init other components
     state_change.initialize(server)
+    
+    @server.state.change("img_file")
+    def update_img_file(img_file, **kwargs):
+        print("update_img_file:", img_file)
+        # server.controller.view_update()
     
     with VAppLayout(server) as layout:
         
@@ -144,12 +145,31 @@ def initialize(server):
                     "tooltipTxt": "ToolBox"
                 },
                 { 
-                    "clickFn": "alert(\'Reload\')", 
+                    "clickFn": lambda : print("server.controller.files_load_file:", str(server.controller.files_load_file)),  # "alert(img_file)", 
                     "iconName": "mdi-reload", 
                     "tooltipTxt": "Reload"
                 },
                 { 
-                    "clickFn": "alert(\'Center to the screen\')", 
+                    "clickFn": #debug code
+                        """ 
+                        console.log(
+                            ((obj, indent = 5) => {
+                                let cache = [];
+                                const retVal = JSON.stringify(
+                                    obj,
+                                    (key, value) =>
+                                    typeof value === 'object' && value !== null
+                                        ? cache.includes(value)
+                                        ? undefined 
+                                        : cache.push(value) && value 
+                                        : value,
+                                    indent
+                                );
+                                cache = null;
+                                return retVal;
+                            })($vuetify.theme)
+                        )
+                        """, #debug code end
                     "iconName": "mdi-arrow-collapse-all", 
                     "tooltipTxt": "Center to the screen"
                 },
@@ -182,37 +202,56 @@ def initialize(server):
             ):  # as drawer:
                 
                 common_attrs = {
-                    "dense": True,
-                    "hide_details": True,
-                }
+                        "dense": True,
+                        "hide_details": True,
+                    }
                 
                 CONTROLS = [ 
-                    files,
-                    pipeline,
-                    algorithms,
-                    settings,
-                ]
+                        files,
+                        pipeline,
+                        algorithms,
+                        settings,
+                    ]
                 
-                files.VISIBLE = False
+                # files.VISIBLE = False
                                
                 for control in CONTROLS: control.initialize(server)
                 
                 with html.Div(classes="d-flex justify-center"):
+                    
+                    vuetify.VTextField(
+                            # v_show=("!!active_controls",),
+                            v_model=("img_file", "C:\..."),
+                            label="Path to .vti file",
+                            placeholder="C:\...",
+                            hint="Path to .vti file",
+                            clearable=True,
+                            outlined=True,
+                            filled=True,
+                            rounded=True,
+                            prepend_inner_icon="mdi-file-image",
+                            dense= True,
+                            hide_details= True,
+                            classes="pt-4 pb-4",
+                        )
+                
+                with html.Div(classes="d-flex justify-center"):
+                    
                     with vuetify.VBtnToggle(
-                        v_model=(
-                            "active_controls", 
-                            #The first visible
-                            next(filter(lambda c: c.VISIBLE, CONTROLS)).NAME
-                        ),
-                        **common_attrs,
-                        outlined=True,
-                        rounded=True,
-                        classes="pt-4 pb-4",
-                    ):
-                        for control in CONTROLS:
-                            if(control.VISIBLE): 
-                                with vuetify.VBtn(value=control.NAME, **common_attrs):
-                                    vuetify.VIcon(control.ICON, **control.ICON_STYLE)
+                            v_model=(
+                                "active_controls", 
+                                #The first visible
+                                next(filter(lambda c: c.VISIBLE, CONTROLS)).NAME
+                            ),
+                            **common_attrs,
+                            outlined=True,
+                            rounded=True,
+                            classes="pt-4 pb-4",
+                        ):
+                            for control in CONTROLS:
+                                if(control.VISIBLE): 
+                                    with vuetify.VBtn(value=control.NAME, **common_attrs):
+                                        vuetify.VIcon(control.ICON, **control.ICON_STYLE)
                 
                 with html.Div(classes="d-flex justify-center"):
                     for control in CONTROLS:
@@ -230,19 +269,19 @@ def initialize(server):
             with vuetify.VContainer(fluid=True, classes="fill-height pa-0 ma-0"):
                 #view_toolbox.create_view_toolbox(server)
                 html_view = paraview.VtkRemoteLocalView(
-                    simple.GetRenderView() if simple else None,
-                    interactive_ratio=("view_interactive_ratio", 1),
-                    interactive_quality=("view_interactive_quality", 70),
-                    mode="remote",
-                    namespace="view",
-                    style="width: 100%; height: 100%;",
-                )
+                        simple.GetRenderView() if simple else None,
+                        interactive_ratio=("view_interactive_ratio", 1),
+                        interactive_quality=("view_interactive_quality", 70),
+                        mode="remote",
+                        namespace="view",
+                        style="width: 100%; height: 100%;",
+                    )
                 server.controller.view_replace = html_view.replace_view
                 server.controller.view_update = html_view.update
                 server.controller.view_reset_camera = html_view.reset_camera
                 server.controller.on_server_ready.add(
-                    server.controller.view_update
-                )
+                        server.controller.view_update
+                    )
         
     """
     https://github.com/vuetifyjs/vuetify/issues/11378
