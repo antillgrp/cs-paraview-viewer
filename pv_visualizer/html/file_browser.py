@@ -280,7 +280,9 @@ class ParaViewFileBrowser(AbstractFileBrowser):
         self._pv_resolver = ParaViewPathResolver(
             base_path, root_name, exclude_regex, group_regex
         )
+        
         self._on_load_file = on_load_file
+        print("ParaViewFileBrowser _on_load_file:", str(self._on_load_file))
         super().__init__(self._pv_resolver, self._on_load_file, namespace, **kwargs)
 
         self.server.state[self._key_path] = [root_name]

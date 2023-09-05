@@ -6,6 +6,8 @@ from trame_simput import get_simput_manager
 
 from paraview import simple
 
+from pathlib import Path # https://docs.python.org/3/library/pathlib.html
+
 # from pv_visualizer import html as my_widgets
 from pv_visualizer.app.assets import asset_manager
 from pv_visualizer.app.ui import (
@@ -16,8 +18,10 @@ from pv_visualizer.app.ui import (
     #view_toolbox,
     state_change,
 )
-#from pip._vendor.rich import print
 
+# -----------------------------------------------------------------------------
+# Dynamic reloading
+# -----------------------------------------------------------------------------
 
 def _reload():
     dev.reload(
@@ -29,18 +33,10 @@ def _reload():
         state_change,
     )
 
-# -----------------------------------------------------------------------------
-# Dynamic reloading
-# -----------------------------------------------------------------------------
-
 LIFE_CYCLES = [
-    "on_data_change",
-    "on_active_proxy_change",
-]
-
-# -----------------------------------------------------------------------------
-# Layout
-# -----------------------------------------------------------------------------
+        "on_data_change",
+        "on_active_proxy_change",
+    ]
 
 def create_main_toolbox(TOOLS):
     
@@ -78,10 +74,35 @@ def create_main_toolbox(TOOLS):
                 prepend_inner_icon="mdi-magnify",
                 dense= True,
                 hide_details= True,
+                
             )
+            
+    # will be replaced by passing file info from iframe parent
+    with html.Div(
+                color="transparent",
+                classes="d-flex justify-center pt-2 pb-2 pl-4 pr-4 mb-4",
+                style="""
+                    position: absolute; bottom: 0; left: 0; z-index: 1;
+                    width: 70%; 
+                """
+                # border-color: red; border-style: solid; border-width: thin; 
+            ):
+            vuetify.VTextField(
+                    # v_show=("!!active_controls",),
+                    v_model=("img_file", ""),
+                    label="Path to .vti file",
+                    placeholder="C:\...",
+                    hint="Path to .vti file",
+                    clearable=True,
+                    outlined=True,
+                    filled=True,
+                    rounded=True,
+                    prepend_inner_icon="mdi-file-image",
+                    dense= True,
+                    hide_details= True,
+                )
                     
 def initialize(server):
-    
     #state, ctrl = server.state, server.controller
 
     # state
@@ -109,31 +130,36 @@ def initialize(server):
     server.controller.pxm_apply = simput_widget.apply
     server.controller.pxm_reset = simput_widget.reset
     
-    # from pprint import pprint
-    # import inspect
-    # print("server.state:")
-    # pprint(inspect.getmembers(server.state))
-    
     # Init other components
     state_change.initialize(server)
     
     @server.state.change("img_file")
     def update_img_file(img_file, **kwargs):
-        print("update_img_file:", img_file)
-        # server.controller.view_update()
+        # sample D:\CS4-DEV\cs-paraview-viewer\ParaView\vti\sample.vti
+        vtiFile = Path(img_file)
+        if vtiFile.exists() and vtiFile.is_file():
+            # print("file found:", img_file) #debug
+            # print("file name:", vtiFile.name) #debug
+            # print("file suffix:", vtiFile.suffix) #debug
+            server.controller.files_load_file(img_file, False)
+        else:
+            print("file not found:", img_file)
+    
+    #------------------------------------------------------------------
+    # Layout
+    #------------------------------------------------------------------
     
     with VAppLayout(server) as layout:
-        
         layout.root = simput_widget
-       
+        
         layout.on_server_reload = lambda self: self.server.controller.on_server_reload(self.server)
         
         layout.template_name="main"
         drawer_name = f"{layout.template_name}_drawer"
         
-        # -----------------------------------------------------------------------------
+        #----------------------------------------------------------------
         # Main ToolBox (replacing ToolBar)
-        # -----------------------------------------------------------------------------
+        #----------------------------------------------------------------
                 
         """
             {"clickFn": ...,"iconName": ..., "tooltipTxt": ...}
@@ -187,9 +213,9 @@ def initialize(server):
         
         #print(layout) #debug
         
-        # -----------------------------------------------------------------------------
+        #-----------------------------------------------------------------
         # Main Drawer
-        # -----------------------------------------------------------------------------
+        #-----------------------------------------------------------------
         
         with vuetify.VNavigationDrawer(
                 app=True,
@@ -197,7 +223,7 @@ def initialize(server):
                 clipped=True,
                 stateless=True,
                 v_model=(drawer_name, True),
-                width=350,
+                width="30vw",
                 #color="transparent",
             ):  # as drawer:
                 
@@ -213,27 +239,9 @@ def initialize(server):
                         settings,
                     ]
                 
-                # files.VISIBLE = False
+                files.VISIBLE = False
                                
                 for control in CONTROLS: control.initialize(server)
-                
-                with html.Div(classes="d-flex justify-center"):
-                    
-                    vuetify.VTextField(
-                            # v_show=("!!active_controls",),
-                            v_model=("img_file", "C:\..."),
-                            label="Path to .vti file",
-                            placeholder="C:\...",
-                            hint="Path to .vti file",
-                            clearable=True,
-                            outlined=True,
-                            filled=True,
-                            rounded=True,
-                            prepend_inner_icon="mdi-file-image",
-                            dense= True,
-                            hide_details= True,
-                            classes="pt-4 pb-4",
-                        )
                 
                 with html.Div(classes="d-flex justify-center"):
                     
@@ -257,9 +265,9 @@ def initialize(server):
                     for control in CONTROLS:
                         if(control.VISIBLE): control.create_panel(server)
         
-        # -----------------------------------------------------------------------------
+        #---------------------------------------------------------------
         # Main Content
-        # -----------------------------------------------------------------------------
+        #---------------------------------------------------------------
         
         # layout.content = vuetify.VMain()
         # debug

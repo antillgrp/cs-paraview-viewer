@@ -34,14 +34,14 @@ def initialize(server, visible=True):
         print("path_prefix:", path_prefix)
         return path_prefix
 
-    def load_file(files):
+    def load_file(files, prefixNeeded=True):
         
         print("FILES: ",str(files))
         
         active_change = False
         if isinstance(files, list):
             # time series
-            files_to_load = map(add_prefix, files)
+            files_to_load = map(add_prefix, files) if prefixNeeded else files 
             reader = simple.OpenDataFile(files_to_load)
             simple.Show(reader)  # Should be deferred
         elif files.endswith(".pvsm"):
@@ -63,7 +63,7 @@ def initialize(server, visible=True):
             active_change = True
         else:
             # data file
-            data_to_load = add_prefix(files)
+            data_to_load = add_prefix(files) if prefixNeeded else files
             reader = simple.OpenDataFile(data_to_load)
             simple.Show(reader)  # Should be deferred
 
