@@ -43,41 +43,40 @@ TOP_ICONS = [
 def create_panel(server, width=300):
     ctrl = server.controller
     with html.Div(
-        v_if=(f"active_controls == '{NAME}'",),
-        classes="pa-0 ma-0 d-flex flex-column",
-        style="""
-            border-color: green;border-style: solid; border-width: thick;
-            height: 100%; width: 98%;
-        """
-        # style="height: 100%; width: 90%; border-color: green;border-style: solid; border-width: thick;",
+            v_if=(f"active_controls == '{NAME}'",),
+            classes="pa-0 ma-0 d-flex flex-column",
+            style="""
+                border-color: green;border-style: solid; border-width: thick;
+                height: 100%; width: 98%;
+            """
         ):
-        pass
-        # with vuetify.VToolbar(
-        #     dense=True, outlined=True, classes="pa-0 ma-0", style="flex: none;"
-        # ):
-        #     with vuetify.VTabs(
-        #         v_model=("pipeline_elem", 0),
-        #         **COMPACT,
-        #         outlined=True,
-        #         rounded=True,
-        #         required=True,
-        #     ):
-        #         for item in TOP_ICONS:
-        #             with vuetify.VTab(
-        #                 classes="px-0 mx-0",
-        #                 style="min-width: 40px;",
-        #                 **COMPACT,
-        #             ):
-        #                 vuetify.VIcon(item.get("icon"), **item.get("kwargs"))
+        
+            with vuetify.VToolbar(
+                dense=True, outlined=True, classes="pa-0 ma-0", style="flex: none;"
+            ):
+                with vuetify.VTabs(
+                    v_model=("pipeline_elem", 0),
+                    **COMPACT,
+                    outlined=True,
+                    rounded=True,
+                    required=True,
+                ):
+                    for item in TOP_ICONS:
+                        with vuetify.VTab(
+                            classes="px-0 mx-0",
+                            style="min-width: 40px;",
+                            **COMPACT,
+                        ):
+                            vuetify.VIcon(item.get("icon"), **item.get("kwargs"))
 
-        #     vuetify.VSpacer()
-        #     with vuetify.VBtn(
-        #         small=True,
-        #         icon=True,
-        #         click="show_pipeline = !show_pipeline",
-        #     ):
-        #         vuetify.VIcon(ICON_COLLAPSE, v_if=("show_pipeline",))
-        #         vuetify.VIcon(ICON_EXPAND, v_if=("!show_pipeline",))
+                # vuetify.VSpacer()
+                # with vuetify.VBtn(
+                #     small=True,
+                #     icon=True,
+                #     click="show_pipeline = !show_pipeline",
+                # ):
+                #     vuetify.VIcon(ICON_COLLAPSE, v_if=("show_pipeline",))
+                #     vuetify.VIcon(ICON_EXPAND, v_if=("!show_pipeline",))
 
         # with html.Div(
         #     style="flex: none; max-height: calc((100vh - 48px)/2 - 48px); overflow: auto;",

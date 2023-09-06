@@ -257,9 +257,17 @@ def initialize(server):
                             classes="pt-4 pb-4",
                         ):
                             for control in CONTROLS:
-                                if(control.VISIBLE): 
-                                    with vuetify.VBtn(value=control.NAME, **common_attrs):
-                                        vuetify.VIcon(control.ICON, **control.ICON_STYLE)
+                                if(control.VISIBLE):
+                                    with vuetify.VTooltip(bottom=True): 
+                                        with vuetify.Template(v_slot_activator="{ on, attrs }"):
+                                            with vuetify.VBtn(
+                                                    v_bind="attrs",
+                                                    v_on="on",
+                                                    value=control.NAME, 
+                                                    **common_attrs
+                                                ):
+                                                vuetify.VIcon(control.ICON, **control.ICON_STYLE)
+                                        html.Span(control.NAME)
                 
                 with html.Div(classes="d-flex justify-center"):
                     for control in CONTROLS:
