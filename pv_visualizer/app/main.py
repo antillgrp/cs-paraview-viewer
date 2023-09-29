@@ -3,7 +3,6 @@ from trame.app import get_server
 
 SERVER = None
 
-
 def main(server=None, data=None, plugins=None, **kwargs):
     from . import engine, ui
 
@@ -11,7 +10,9 @@ def main(server=None, data=None, plugins=None, **kwargs):
     if server is None:
         server = get_server()
 
-    # Add CLI
+    # Adding CLI parameters
+    
+    # Will get deprecated for Certscan (not longer supported) 
     if data is None:
         server.cli.add_argument(
             "--data", help="Path to browse", dest="data", default=str(Path.home())
